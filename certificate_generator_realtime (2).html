@@ -1,0 +1,757 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Certificate Generator - CloudX</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        
+        h1 {
+            color: #667eea;
+            text-align: center;
+            margin-bottom: 10px;
+            font-size: 2.5em;
+        }
+        
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 40px;
+        }
+        
+        .main-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+        }
+        
+        @media (max-width: 1024px) {
+            .main-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .left-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        
+        .upload-section {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 15px;
+        }
+        
+        .upload-box {
+            border: 3px dashed #667eea;
+            border-radius: 10px;
+            padding: 30px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .upload-box:hover {
+            background: #f0f4ff;
+            border-color: #764ba2;
+        }
+        
+        .upload-box label {
+            cursor: pointer;
+            color: #667eea;
+            font-weight: bold;
+            font-size: 1em;
+        }
+        
+        input[type="file"] {
+            display: none;
+        }
+        
+        .names-section {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 15px;
+        }
+        
+        .names-section h3 {
+            color: #667eea;
+            margin-bottom: 15px;
+        }
+        
+        textarea {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            font-size: 16px;
+            font-family: inherit;
+            resize: vertical;
+            min-height: 120px;
+        }
+        
+        textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .controls {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 15px;
+        }
+        
+        .controls h3 {
+            color: #667eea;
+            margin-bottom: 20px;
+        }
+        
+        .control-group {
+            margin-bottom: 20px;
+        }
+        
+        .control-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 600;
+            font-size: 14px;
+        }
+        
+        input[type="range"] {
+            width: 100%;
+            height: 8px;
+            border-radius: 5px;
+            background: #ddd;
+            outline: none;
+        }
+        
+        input[type="range"]::-webkit-slider-thumb {
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #667eea;
+            cursor: pointer;
+        }
+        
+        input[type="range"]::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #667eea;
+            cursor: pointer;
+            border: none;
+        }
+        
+        input[type="color"] {
+            width: 60px;
+            height: 40px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+        
+        .value-display {
+            display: inline-block;
+            margin-left: 10px;
+            color: #667eea;
+            font-weight: bold;
+        }
+        
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            font-size: 18px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: bold;
+            width: 100%;
+            margin-top: 10px;
+            transition: transform 0.2s;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+        
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .preview-section {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 15px;
+            position: sticky;
+            top: 20px;
+        }
+        
+        .preview-section h3 {
+            color: #667eea;
+            margin-bottom: 15px;
+        }
+        
+        .preview-name-selector {
+            margin-bottom: 15px;
+        }
+        
+        .preview-name-selector select {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            background: white;
+        }
+        
+        .canvas-container {
+            position: relative;
+            background: #fff;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        #preview {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+        
+        .status {
+            text-align: center;
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 20px;
+            font-weight: 600;
+            display: none;
+        }
+        
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+            display: block;
+        }
+        
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+            display: block;
+        }
+        
+        .generated-list {
+            margin-top: 20px;
+            display: none;
+        }
+        
+        .cert-item {
+            background: white;
+            padding: 12px 15px;
+            border-radius: 8px;
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+        
+        .cert-item button {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 14px;
+        }
+        
+        .cert-item button:hover {
+            background: #764ba2;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎓 Certificate Generator</h1>
+        <p class="subtitle">Real-time preview • Drag sliders to adjust position</p>
+        
+        <div class="main-grid">
+            <!-- Left Panel -->
+            <div class="left-panel">
+                <div class="upload-section">
+                    <div class="upload-box" onclick="document.getElementById('templateInput').click()">
+                        <label>📄 Click to Upload Certificate Template</label>
+                        <input type="file" id="templateInput" accept="image/*">
+                        <p id="templateName" style="margin-top: 10px; color: #28a745; font-size: 14px;"></p>
+                    </div>
+                </div>
+                
+                <div class="names-section">
+                    <h3>📝 Enter Names</h3>
+                    <textarea id="namesInput" placeholder="Enter one name per line...">Rayyan
+Nikhil Velayudham
+S. UDBHAV
+Nandan S G</textarea>
+                </div>
+                
+                <div class="controls">
+                    <h3>⚙️ Adjust Position & Style</h3>
+                    
+                    <div class="control-group">
+                        <label>Name X Position: <span class="value-display" id="xValue">50%</span></label>
+                        <input type="range" id="nameX" min="0" max="100" value="50">
+                    </div>
+                    
+                    <div class="control-group">
+                        <label>Name Y Position: <span class="value-display" id="yValue">50%</span></label>
+                        <input type="range" id="nameY" min="0" max="100" value="50">
+                    </div>
+                    
+                    <div class="control-group">
+                        <label>Font Size: <span class="value-display" id="fontValue">60px</span></label>
+                        <input type="range" id="fontSize" min="20" max="200" value="60">
+                    </div>
+                    
+                    <div class="control-group">
+                        <label>Text Color:</label>
+                        <input type="color" id="textColor" value="#000000">
+                    </div>
+                </div>
+                
+                <button class="btn" id="generateBtn" onclick="generateCertificates()">
+                    🎨 Generate All Certificates
+                </button>
+                
+                <button class="btn" id="downloadZipBtn" onclick="downloadAllAsZip()" style="display: none; background: linear-gradient(135deg, #28a745 0%, #20c997 100%);">
+                    📦 Download All as ZIP
+                </button>
+                
+                <div id="status" class="status"></div>
+                
+                <div id="generatedList" class="generated-list">
+                    <h3 style="color: #667eea; margin-bottom: 15px;">📥 Download Individual Certificates:</h3>
+                    <div id="certList"></div>
+                </div>
+            </div>
+            
+            <!-- Right Panel - Preview -->
+            <div class="preview-section">
+                <h3>👁️ Real-time Preview</h3>
+                <div class="preview-name-selector">
+                    <select id="previewName" onchange="updatePreview()">
+                        <option value="0">Preview: First name</option>
+                    </select>
+                </div>
+                <div class="canvas-container">
+                    <canvas id="preview"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        let templateImage = null;
+        let templateLoaded = false;
+        let generatedCertificates = [];
+        
+        // Update value displays and preview in real-time
+        document.getElementById('nameX').addEventListener('input', function() {
+            document.getElementById('xValue').textContent = this.value + '%';
+            updatePreview();
+        });
+        
+        document.getElementById('nameY').addEventListener('input', function() {
+            document.getElementById('yValue').textContent = this.value + '%';
+            updatePreview();
+        });
+        
+        document.getElementById('fontSize').addEventListener('input', function() {
+            document.getElementById('fontValue').textContent = this.value + 'px';
+            updatePreview();
+        });
+        
+        document.getElementById('textColor').addEventListener('input', function() {
+            updatePreview();
+        });
+        
+        document.getElementById('namesInput').addEventListener('input', function() {
+            updateNameSelector();
+            updatePreview();
+        });
+        
+        // Template upload
+        document.getElementById('templateInput').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                document.getElementById('templateName').textContent = '⏳ Loading...';
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    templateImage = new Image();
+                    templateImage.onload = function() {
+                        templateLoaded = true;
+                        document.getElementById('templateName').textContent = '✓ ' + file.name;
+                        showStatus('Template loaded! Adjust sliders to position text.', 'success');
+                        updatePreview();
+                    };
+                    templateImage.onerror = function() {
+                        showStatus('Error loading image. Please use a valid image file.', 'error');
+                        document.getElementById('templateName').textContent = '❌ Failed to load';
+                    };
+                    templateImage.src = event.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+        
+        function updateNameSelector() {
+            const namesText = document.getElementById('namesInput').value.trim();
+            const names = namesText.split('\n').filter(name => name.trim() !== '');
+            const selector = document.getElementById('previewName');
+            
+            selector.innerHTML = '';
+            names.forEach((name, index) => {
+                const option = document.createElement('option');
+                option.value = index;
+                option.textContent = `Preview: ${name.trim()}`;
+                selector.appendChild(option);
+            });
+        }
+        
+        function updatePreview() {
+            if (!templateImage || !templateLoaded) return;
+            
+            const namesText = document.getElementById('namesInput').value.trim();
+            const names = namesText.split('\n').filter(name => name.trim() !== '');
+            
+            if (names.length === 0) return;
+            
+            const previewIndex = parseInt(document.getElementById('previewName').value) || 0;
+            const name = names[previewIndex] ? names[previewIndex].trim() : names[0].trim();
+            
+            const nameX = parseInt(document.getElementById('nameX').value);
+            const nameY = parseInt(document.getElementById('nameY').value);
+            const fontSize = parseInt(document.getElementById('fontSize').value);
+            const textColor = document.getElementById('textColor').value;
+            
+            const canvas = document.getElementById('preview');
+            const ctx = canvas.getContext('2d');
+            
+            canvas.width = templateImage.width;
+            canvas.height = templateImage.height;
+            
+            // Clear canvas
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // Draw template
+            ctx.drawImage(templateImage, 0, 0);
+            
+            // Set text properties - lighter font weight
+            ctx.font = `${fontSize}px Arial, Helvetica, sans-serif`;
+            ctx.fillStyle = textColor;
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            
+            // Calculate position
+            const x = (nameX / 100) * canvas.width;
+            const y = (nameY / 100) * canvas.height;
+            
+            // Draw name
+            ctx.fillText(name, x, y);
+        }
+        
+        function showStatus(message, type) {
+            const status = document.getElementById('status');
+            status.textContent = message;
+            status.className = 'status ' + type;
+        }
+        
+        function downloadImage(dataUrl, filename) {
+            const link = document.createElement('a');
+            link.href = dataUrl;
+            link.download = filename;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+        
+        function generateCertificates() {
+            if (!templateImage || !templateLoaded) {
+                showStatus('❌ Please upload a certificate template first!', 'error');
+                return;
+            }
+            
+            const namesText = document.getElementById('namesInput').value.trim();
+            if (!namesText) {
+                showStatus('❌ Please enter at least one name!', 'error');
+                return;
+            }
+            
+            const names = namesText.split('\n').filter(name => name.trim() !== '');
+            
+            if (names.length === 0) {
+                showStatus('❌ No valid names found!', 'error');
+                return;
+            }
+            
+            const nameX = parseInt(document.getElementById('nameX').value);
+            const nameY = parseInt(document.getElementById('nameY').value);
+            const fontSize = parseInt(document.getElementById('fontSize').value);
+            const textColor = document.getElementById('textColor').value;
+            
+            const btn = document.getElementById('generateBtn');
+            btn.disabled = true;
+            btn.textContent = '⏳ Generating...';
+            
+            generatedCertificates = [];
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            
+            canvas.width = templateImage.width;
+            canvas.height = templateImage.height;
+            
+            const certList = document.getElementById('certList');
+            certList.innerHTML = '';
+            
+            for (let i = 0; i < names.length; i++) {
+                const name = names[i].trim();
+                
+                // Clear canvas
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                
+                // Draw template
+                ctx.drawImage(templateImage, 0, 0);
+                
+                // Set text properties - lighter font weight
+                ctx.font = `${fontSize}px Arial, Helvetica, sans-serif`;
+                ctx.fillStyle = textColor;
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                
+                // Calculate position
+                const x = (nameX / 100) * canvas.width;
+                const y = (nameY / 100) * canvas.height;
+                
+                // Draw name
+                ctx.fillText(name, x, y);
+                
+                // Save as data URL
+                const dataUrl = canvas.toDataURL('image/png');
+                const safeName = name.replace(/[^a-z0-9]/gi, '_').toLowerCase();
+                const filename = `${safeName}_certificate.png`;
+                
+                generatedCertificates.push({ name: name, dataUrl: dataUrl, filename: filename });
+                
+                // Create download button
+                const certItem = document.createElement('div');
+                certItem.className = 'cert-item';
+                certItem.innerHTML = `
+                    <span><strong>${name}</strong></span>
+                    <button onclick="downloadCert(${i})">⬇️ Download</button>
+                `;
+                certList.appendChild(certItem);
+            }
+            
+            document.getElementById('generatedList').style.display = 'block';
+            document.getElementById('downloadZipBtn').style.display = 'block';
+            showStatus('✅ Generated ' + names.length + ' certificate(s)!', 'success');
+            
+            btn.disabled = false;
+            btn.textContent = '🎨 Generate All Certificates';
+        }
+        
+        function downloadCert(index) {
+            const cert = generatedCertificates[index];
+            downloadImage(cert.dataUrl, cert.filename);
+        }
+        
+        // Simple ZIP file creation with proper CRC32
+        async function downloadAllAsZip() {
+            if (generatedCertificates.length === 0) {
+                showStatus('❌ No certificates to download!', 'error');
+                return;
+            }
+            
+            const btn = document.getElementById('downloadZipBtn');
+            btn.disabled = true;
+            btn.textContent = '⏳ Creating ZIP...';
+            
+            showStatus('⏳ Creating ZIP file...', 'success');
+            
+            try {
+                const zip = await createProperZip(generatedCertificates);
+                
+                const link = document.createElement('a');
+                link.href = URL.createObjectURL(zip);
+                link.download = 'certificates.zip';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                URL.revokeObjectURL(link.href);
+                
+                showStatus('✅ ZIP file downloaded successfully!', 'success');
+            } catch (error) {
+                console.error('ZIP Error:', error);
+                showStatus('❌ Error creating ZIP: ' + error.message, 'error');
+            } finally {
+                btn.disabled = false;
+                btn.textContent = '📦 Download All as ZIP';
+            }
+        }
+        
+        // CRC32 calculation
+        function crc32(data) {
+            const table = [];
+            for (let i = 0; i < 256; i++) {
+                let c = i;
+                for (let j = 0; j < 8; j++) {
+                    c = (c & 1) ? (0xEDB88320 ^ (c >>> 1)) : (c >>> 1);
+                }
+                table[i] = c;
+            }
+            
+            let crc = 0 ^ (-1);
+            for (let i = 0; i < data.length; i++) {
+                crc = (crc >>> 8) ^ table[(crc ^ data[i]) & 0xFF];
+            }
+            return (crc ^ (-1)) >>> 0;
+        }
+        
+        function getCurrentDateTime() {
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = now.getMonth() + 1;
+            const day = now.getDate();
+            const hours = now.getHours();
+            const minutes = now.getMinutes();
+            const seconds = now.getSeconds();
+            
+            const dosDate = ((year - 1980) << 9) | (month << 5) | day;
+            const dosTime = (hours << 11) | (minutes << 5) | (seconds >> 1);
+            
+            return { dosDate, dosTime };
+        }
+        
+        async function createProperZip(certificates) {
+            const encoder = new TextEncoder();
+            const { dosDate, dosTime } = getCurrentDateTime();
+            
+            const localFiles = [];
+            const centralDirectory = [];
+            let offset = 0;
+            
+            // Process each file
+            for (const cert of certificates) {
+                // Get file data
+                const response = await fetch(cert.dataUrl);
+                const fileData = new Uint8Array(await response.arrayBuffer());
+                const fileName = encoder.encode(cert.filename);
+                const crc = crc32(fileData);
+                
+                // Local file header (30 bytes + filename)
+                const localHeader = new Uint8Array(30 + fileName.length);
+                const lhView = new DataView(localHeader.buffer);
+                
+                lhView.setUint32(0, 0x04034b50, true);  // Local file header signature
+                lhView.setUint16(4, 20, true);          // Version needed to extract
+                lhView.setUint16(6, 0, true);           // General purpose bit flag
+                lhView.setUint16(8, 0, true);           // Compression method (0 = stored)
+                lhView.setUint16(10, dosTime, true);    // File modification time
+                lhView.setUint16(12, dosDate, true);    // File modification date
+                lhView.setUint32(14, crc, true);        // CRC-32
+                lhView.setUint32(18, fileData.length, true);  // Compressed size
+                lhView.setUint32(22, fileData.length, true);  // Uncompressed size
+                lhView.setUint16(26, fileName.length, true);  // Filename length
+                lhView.setUint16(28, 0, true);          // Extra field length
+                
+                localHeader.set(fileName, 30);
+                
+                localFiles.push(localHeader);
+                localFiles.push(fileData);
+                
+                // Central directory header (46 bytes + filename)
+                const cdHeader = new Uint8Array(46 + fileName.length);
+                const cdView = new DataView(cdHeader.buffer);
+                
+                cdView.setUint32(0, 0x02014b50, true);  // Central directory signature
+                cdView.setUint16(4, 20, true);          // Version made by
+                cdView.setUint16(6, 20, true);          // Version needed to extract
+                cdView.setUint16(8, 0, true);           // General purpose bit flag
+                cdView.setUint16(10, 0, true);          // Compression method
+                cdView.setUint16(12, dosTime, true);    // File modification time
+                cdView.setUint16(14, dosDate, true);    // File modification date
+                cdView.setUint32(16, crc, true);        // CRC-32
+                cdView.setUint32(20, fileData.length, true);  // Compressed size
+                cdView.setUint32(24, fileData.length, true);  // Uncompressed size
+                cdView.setUint16(28, fileName.length, true);  // Filename length
+                cdView.setUint16(30, 0, true);          // Extra field length
+                cdView.setUint16(32, 0, true);          // File comment length
+                cdView.setUint16(34, 0, true);          // Disk number start
+                cdView.setUint16(36, 0, true);          // Internal file attributes
+                cdView.setUint32(38, 0, true);          // External file attributes
+                cdView.setUint32(42, offset, true);     // Relative offset of local header
+                
+                cdHeader.set(fileName, 46);
+                
+                centralDirectory.push(cdHeader);
+                
+                offset += localHeader.length + fileData.length;
+            }
+            
+            const centralDirStart = offset;
+            let centralDirSize = 0;
+            
+            for (const cd of centralDirectory) {
+                centralDirSize += cd.length;
+            }
+            
+            // End of central directory record (22 bytes)
+            const eocd = new Uint8Array(22);
+            const eocdView = new DataView(eocd.buffer);
+            
+            eocdView.setUint32(0, 0x06054b50, true);    // End of central dir signature
+            eocdView.setUint16(4, 0, true);             // Number of this disk
+            eocdView.setUint16(6, 0, true);             // Disk where central directory starts
+            eocdView.setUint16(8, certificates.length, true);   // Number of central directory records on this disk
+            eocdView.setUint16(10, certificates.length, true);  // Total number of central directory records
+            eocdView.setUint32(12, centralDirSize, true);       // Size of central directory
+            eocdView.setUint32(16, centralDirStart, true);      // Offset of start of central directory
+            eocdView.setUint16(20, 0, true);            // ZIP file comment length
+            
+            // Combine everything
+            const allParts = [...localFiles, ...centralDirectory, eocd];
+            return new Blob(allParts, { type: 'application/zip' });
+        }
+        
+        // Initialize
+        updateNameSelector();
+    </script>
+</body>
+</html>
