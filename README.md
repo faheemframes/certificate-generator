@@ -11,7 +11,7 @@ A simple, offline certificate generator tool. Upload your template, enter names,
 - Download all as ZIP
 
 ## How to Use
-1. Open the tool: [Live Demo](https://faheemframes.github.io/certificate-generator/certificate_generator_realtime.html)
+1. Open the tool: [Live Demo](https://faheemframes.github.io/certificate-generator/index.html)
 2. Upload your certificate template
 3. Enter names (one per line)
 4. Adjust position using sliders
